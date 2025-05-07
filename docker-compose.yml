@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  mi-tv-admin:
+    build: .
+    container_name: mi-tv-admin
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+    restart: unless-stopped
