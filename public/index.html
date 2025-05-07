@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Room Admin</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 2em auto; }
+    input, button { padding: 0.5em; margin-top: 0.5em; width: 100%; }
+    .room { margin: 1em 0; border-bottom: 1px solid #ccc; padding-bottom: 0.5em; }
+  </style>
+</head>
+<body>
+  <h2>Manage Rooms</h2>
+  <div>
+    <input id="room" placeholder="Room Number" type="number" />
+    <input id="guest" placeholder="Guest Name" />
+    <button onclick="addRoom()">Add Room</button>
+  </div>
+  <h3>Room List</h3>
+  <div id="rooms"></div>
+
+<script>
+async function loadRooms() {
+  const res = await fetch('/api/rooms');
+  const rooms = await res.json();
+  const container = document.getElementById('rooms');
+  container.innerHTML = '';
+  rooms.forEach(r => {
+    container.innerHTML += `
+      <div class="room">
+        <strong>Room ${r.room}</strong><br />
+        Guest: <input value="${r.guest}" onchange="updateGuest(${r.room}, this.value)" />
+        <a href="/room/${r.room}" target="_blank">View Welcome Page</a>
+      </div>`;
+  });
+}
+
+async function addRoom() {
+  const room = document.getElementById('room').value;
+  const guest = document.getElementById('guest').value;
+  await fetch('/api/rooms', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ room: parseInt(room), guest })
+  });
+  loadRooms();
+}
+
+async function updateGuest(room, guest) {
+  await fetch('/api/rooms/' + room, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ guest })
+  });
+}
+
+loadRooms();
+</script>
+</body>
+</html>
